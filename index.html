@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Swap App</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.11.1/dist/web3.min.js"></script>
+    <script src="./contracts.js"></script>
+    <script src="./script.js"></script>
+</head>
+<body>
+    <button id="conect" onclick="connect()">
+        <label id="account" style="cursor: pointer;">Conectar</label>
+    </button>
+    <br>
+    
+    <div id='swap-box'>
+        <div id="swap-menu">
+            <label class="token">USDT</label> to <label class="token">Aleph</label>
+        </div>
+        
+        <div id="swap-title-box">
+            <p id="swap-title">Swap</p>
+            <p id="swap-subtitle">Trade tokens in an instant</p>
+        </div>
+        
+        <div id="swap-form-box">
+            <form id='form' onsubmit='handleSubmit(); return false;'>
+                <div class="input-group">
+                    <label>
+                        <img id="alephLogo" src='./Aleph.png' class="logo" alt="Aleph Logo" /> 
+                        <span class="token">Aleph</span>
+                        <div class="swap-balance pick-balance">
+                            Balance: <span class="balance" id="balanceAleph">0</span>
+                        </div>
+                    </label>
+                    <input onchange='setValueTokenToSpend()' type="text" class="IHAVE" placeholder="0.0">
+                </div>
+                
+                <br>
+                
+                <div class="input-group">
+                    <label>
+                        <img id="usdtLogo" src='./USDT.png' class="logo" alt="USDT Logo"/>
+                        <span class="token">USDT</span>
+                        <div class="swap-balance">
+                            Balance: <span class="balance" id="balanceUSDT">0</span>
+                        </div>
+                    </label>
+                    <input type="text" class="IWANT" placeholder="0.0">
+                </div>
+                
+                <div class="separador-vertical"></div>
+                
+                <div id="swap-price-word">
+                    Price 
+                    <div id="swap-price">
+                        TOKEN_PRICE <span class="precio">0</span> USDT
+                    </div>
+                </div>
+                
+                <button id="swap-submit" type="submit">Swap</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="toast"></div>
+    
+    <div id="spinner" class="spinner-container">
+        <div class="spinner"></div>
+    </div>
+</body>
+</html>
+
+Smart, efficient model for everyday use Más información
+Artefactos
+
+Contenido
