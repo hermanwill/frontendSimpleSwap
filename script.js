@@ -1,7 +1,7 @@
 // Configuración del contrato
-const addressContract = "0xa952D65D50bf0BfA872271348D61984E35536561"; // Reemplazar con la dirección real
-const tokenAAddress = "0x1234567890123456789012345678901234567890"; // Reemplazar con la dirección real del Token A
-const tokenBAddress = "0x0987654321098765432109876543210987654321"; // Reemplazar con la dirección real del Token B
+const addressContract = "0xC52f33Cc4d48F3C72144C2b0E82C25B401bEF1f5"; // Reemplazar con la dirección real
+const tokenAAddress = "0xB9D62F684D533D89ed7a59f0b97aa6847Ea7b935"; // Reemplazar con la dirección real del Token A
+const tokenBAddress = "0x15d00E0E845d981f03010Aa69f6045EB305f30b6"; // Reemplazar con la dirección real del Token B
 
 // ABI del contrato SimpleSwap (versión simplificada con las funciones principales)
 const simpleSwapABI = [
