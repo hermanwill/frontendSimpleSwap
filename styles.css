@@ -1,4 +1,4 @@
-/* Reset básico */
+/* @dev Basic reset */
 * {
     margin: 0;
     padding: 0;
@@ -16,7 +16,7 @@ body {
     min-height: 100vh;
 }
 
-/* Botones */
+/* @dev Button styles */
 button {
     background-color: #0057b8;
     color: white;
@@ -42,7 +42,7 @@ button:disabled:hover {
     background-color: #cccccc;
 }
 
-/* Contenedor principal */
+/* @dev Main container */
 .container {
     background-color: white;
     padding: 30px;
@@ -54,14 +54,14 @@ button:disabled:hover {
     margin-top: 30px;
 }
 
-/* Título */
+/* @dev Title styles */
 h1 {
     font-size: 24px;
     color: #0057b8;
     margin-bottom: 20px;
 }
 
-/* Grupos de input */
+/* @dev Input groups */
 .input-group {
     margin-bottom: 15px;
     text-align: left;
@@ -74,7 +74,7 @@ h1 {
     color: #333;
 }
 
-/* Campos de entrada */
+/* @dev Input fields */
 input[type="text"] {
     padding: 10px;
     width: 100%;
@@ -94,7 +94,7 @@ input[readonly] {
     color: #666;
 }
 
-/* Select */
+/* @dev Select elements */
 select {
     padding: 10px;
     width: 100%;
@@ -110,7 +110,7 @@ select:focus {
     box-shadow: 0 0 5px rgba(0, 87, 184, 0.3);
 }
 
-/* Contenedor de intercambio */
+/* @dev Swap container */
 .swap-container {
     background-color: #f8f9fa;
     padding: 20px;
@@ -118,7 +118,7 @@ select:focus {
     margin-bottom: 20px;
 }
 
-/* Botón de intercambio */
+/* @dev Swap direction button */
 .swap-button {
     background-color: #28a745;
     width: 50px;
@@ -133,7 +133,7 @@ select:focus {
     background-color: #218838;
 }
 
-/* Grupo de botones */
+/* @dev Button group */
 .button-group {
     display: flex;
     flex-direction: column;
@@ -145,7 +145,7 @@ select:focus {
     margin: 0;
 }
 
-/* Display de información */
+/* @dev Information display */
 .info-display {
     background-color: #f8f9fa;
     padding: 15px;
@@ -159,7 +159,7 @@ select:focus {
     text-align: left;
 }
 
-/* Texto dinámico */
+/* @dev Dynamic text elements */
 #accountAddress {
     margin-top: 15px;
     font-size: 14px;
@@ -188,7 +188,7 @@ select:focus {
     color: #0c5460;
 }
 
-/* Estados de error */
+/* @dev Error states */
 .error {
     background-color: #f8d7da !important;
     color: #721c24 !important;
@@ -199,7 +199,7 @@ select:focus {
     color: #155724 !important;
 }
 
-/* Responsive */
+/* @dev Responsive design */
 @media (max-width: 600px) {
     body {
         padding: 20px;

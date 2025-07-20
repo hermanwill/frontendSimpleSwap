@@ -1,128 +1,147 @@
 # SimpleSwap Smart Contract
 
-Un contrato inteligente de intercambio descentralizado (DEX) que permite el intercambio de tokens, gestión de liquidez y generación de tokens LP utilizando la fórmula de producto constante.
+An optimized decentralized exchange (DEX) smart contract that enables token swapping, liquidity management, and LP token generation using the constant product formula.
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-- **Intercambio de Tokens**: Swap entre dos tokens ERC20 específicos
-- **Gestión de Liquidez**: Agregar y remover liquidez del pool
-- **Tokens LP**: Generación automática de tokens de liquidez (ERC20)
-- **Precios Dinámicos**: Cálculo de precios basado en reservas
-- **Sin Comisiones**: Intercambios sin fees adicionales
-- **Seguridad**: Protección contra ataques de reentrancy
+- **Token Swapping**: Swap between two specific ERC20 tokens
+- **Liquidity Management**: Add and remove liquidity from the pool
+- **LP Tokens**: Automatic liquidity token generation (ERC20)
+- **Dynamic Pricing**: Price calculation based on reserves
+- **No Fees**: Fee-free token swaps
+- **Optimized**: Code optimized to avoid compilation limitations
 
-## 📋 Requisitos
+## 📋 Requirements
 
 - Solidity ^0.8.17
 - OpenZeppelin Contracts
-- Dos tokens ERC20 válidos para formar el par
+- Two valid ERC20 tokens to form the pair
 
-## 🛠 Instalación
+## 🛠 Installation
 
 ```bash
 npm install @openzeppelin/contracts
 ```
 
-## 📖 Funcionalidades
+### Compilation Configuration
 
-### Gestión de Liquidez
+If you encounter "Stack too deep" compilation errors, configure your `hardhat.config.js`:
+
+```javascript
+module.exports = {
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      },
+      viaIR: true  // Optional: for complex cases
+    }
+  }
+};
+```
+
+## 📖 Functionalities
+
+### Liquidity Management
 
 #### `addLiquidity()`
-Agrega liquidez al pool de intercambio.
+Adds liquidity to the swap pool.
 
-**Parámetros:**
-- `_tokenA`: Dirección del primer token
-- `_tokenB`: Dirección del segundo token  
-- `amountADesired`: Cantidad deseada de tokenA
-- `amountBDesired`: Cantidad deseada de tokenB
-- `amountAMin`: Cantidad mínima aceptable de tokenA
-- `amountBMin`: Cantidad mínima aceptable de tokenB
-- `to`: Dirección que recibirá los tokens LP
-- `deadline`: Timestamp límite para la transacción
+**Parameters:**
+- `_tokenA`: Address of the first token
+- `_tokenB`: Address of the second token
+- `amountADesired`: Desired amount of tokenA
+- `amountBDesired`: Desired amount of tokenB
+- `amountAMin`: Minimum acceptable amount of tokenA
+- `amountBMin`: Minimum acceptable amount of tokenB
+- `to`: Address that will receive the LP tokens
+- `deadline`: Transaction deadline timestamp
 
-**Retorna:**
-- `amountA`: Cantidad real de tokenA agregada
-- `amountB`: Cantidad real de tokenB agregada
-- `liquidity`: Cantidad de tokens LP minteados
+**Returns:**
+- `amountA`: Actual amount of tokenA added
+- `amountB`: Actual amount of tokenB added
+- `liquidity`: Amount of LP tokens minted
 
 #### `removeLiquidity()`
-Remueve liquidez del pool y quema tokens LP.
+Removes liquidity from the pool and burns LP tokens.
 
-**Parámetros:**
-- `_tokenA`: Dirección del primer token
-- `_tokenB`: Dirección del segundo token
-- `liquidity`: Cantidad de tokens LP a quemar
-- `amountAMin`: Cantidad mínima de tokenA a recibir
-- `amountBMin`: Cantidad mínima de tokenB a recibir
-- `to`: Dirección que recibirá los tokens
-- `deadline`: Timestamp límite
+**Parameters:**
+- `_tokenA`: Address of the first token
+- `_tokenB`: Address of the second token
+- `liquidity`: Amount of LP tokens to burn
+- `amountAMin`: Minimum amount of tokenA to receive
+- `amountBMin`: Minimum amount of tokenB to receive
+- `to`: Address that will receive the tokens
+- `deadline`: Transaction deadline
 
-**Retorna:**
-- `amountA`: Cantidad de tokenA retirada
-- `amountB`: Cantidad de tokenB retirada
+**Returns:**
+- `amountA`: Amount of tokenA withdrawn
+- `amountB`: Amount of tokenB withdrawn
 
-### Intercambio de Tokens
+### Token Swapping
 
 #### `swapExactTokensForTokens()`
-Intercambia una cantidad exacta de tokens de entrada por tokens de salida.
+Swaps an exact amount of input tokens for output tokens.
 
-**Parámetros:**
-- `amountIn`: Cantidad exacta de tokens de entrada
-- `amountOutMin`: Cantidad mínima aceptable de tokens de salida
-- `path`: Array con direcciones [tokenIn, tokenOut]
-- `to`: Dirección que recibirá los tokens de salida
-- `deadline`: Timestamp límite
+**Parameters:**
+- `amountIn`: Exact amount of input tokens
+- `amountOutMin`: Minimum acceptable amount of output tokens
+- `path`: Array with addresses [tokenIn, tokenOut]
+- `to`: Address that will receive the output tokens
+- `deadline`: Transaction deadline
 
-### Funciones de Consulta
+### Query Functions
 
 #### `getPrice()`
-Obtiene el precio de un token en términos del otro.
+Gets the price of one token in terms of the other.
 
-**Parámetros:**
-- `_tokenA`: Token base
-- `_tokenB`: Token cotizado
+**Parameters:**
+- `_tokenA`: Base token
+- `_tokenB`: Quote token
 
-**Retorna:**
-- `price`: Precio escalado por 1e18
+**Returns:**
+- `price`: Price scaled by 1e18
 
 #### `getAmountOut()`
-Calcula la cantidad de tokens de salida para una entrada dada.
+Calculates the amount of output tokens for a given input amount.
 
-**Parámetros:**
-- `amountIn`: Cantidad de tokens de entrada
-- `reserveIn`: Reserva del token de entrada
-- `reserveOut`: Reserva del token de salida
+**Parameters:**
+- `amountIn`: Amount of input tokens
+- `reserveIn`: Reserve of the input token
+- `reserveOut`: Reserve of the output token
 
-**Retorna:**
-- `amountOut`: Cantidad de tokens de salida
+**Returns:**
+- `amountOut`: Amount of output tokens
 
 #### `getReserves()`
-Retorna las reservas actuales del pool.
+Returns the current pool reserves.
 
-**Retorna:**
-- `_reserveA`: Reserva del tokenA
-- `_reserveB`: Reserva del tokenB
+**Returns:**
+- `_reserveA`: Current reserve of tokenA
+- `_reserveB`: Current reserve of tokenB
 
-#### Otras Funciones de Vista
-- `getSupportedTokens()`: Retorna las direcciones de los tokens del par
-- `getLiquidityShares(address)`: Retorna tokens LP de un usuario
-- `getTotalLiquidity()`: Retorna liquidez total del pool
+#### Other View Functions
+- `getSupportedTokens()`: Returns the addresses of the token pair
+- `getLiquidityShares(address)`: Returns LP tokens of a user
+- `getTotalLiquidity()`: Returns total pool liquidity
 
-## 🔧 Uso Básico
+## 🔧 Basic Usage
 
-### Despliegue
+### Deployment
 ```solidity
-// Desplegar el contrato con las direcciones de los tokens
+// Deploy the contract with token addresses
 SimpleSwap swap = new SimpleSwap(tokenA_address, tokenB_address);
 ```
 
-### Agregar Liquidez Inicial
+### Add Initial Liquidity
 ```solidity
-// Aprobar tokens antes de agregar liquidez
+// Approve tokens before adding liquidity
 tokenA.approve(address(swap), amountA);
 tokenB.approve(address(swap), amountB);
 
-// Agregar liquidez
+// Add liquidity
 swap.addLiquidity(
     tokenA_address,
     tokenB_address,
@@ -135,17 +154,17 @@ swap.addLiquidity(
 );
 ```
 
-### Realizar Intercambio
+### Execute Swap
 ```solidity
-// Aprobar token de entrada
+// Approve input token
 tokenIn.approve(address(swap), amountIn);
 
-// Crear path de intercambio
+// Create swap path
 address[] memory path = new address[](2);
 path[0] = tokenIn_address;
 path[1] = tokenOut_address;
 
-// Ejecutar swap
+// Execute swap
 swap.swapExactTokensForTokens(
     amountIn,
     amountOutMin,
@@ -155,34 +174,38 @@ swap.swapExactTokensForTokens(
 );
 ```
 
-## ⚡ Optimizaciones
+## ⚡ Optimizations
 
-- **Variables Inmutables**: `tokenA` y `tokenB` son inmutables para eficiencia de gas
-- **Accesos Optimizados**: Uso de variables locales para evitar múltiples lecturas de storage
-- **Strings Cortos**: Mensajes de error ≤31 caracteres para optimización de gas
+- **Immutable Variables**: `tokenA` and `tokenB` are immutable for gas efficiency
+- **Optimized Access**: Use of local variables to avoid multiple storage reads
+- **Short Strings**: Error messages ≤31 characters for gas optimization
+- **Stack Optimized**: Code reorganized to avoid "Stack too deep" errors
+- **Code Blocks**: Use of `{}` blocks to automatically free stack space
 
-## 🔒 Seguridad
+## 🔒 Security
 
-- **ReentrancyGuard**: Protección contra ataques de reentrancy
-- **Validaciones**: Verificaciones exhaustivas de parámetros de entrada
-- **Liquidez Mínima**: MINIMUM_LIQUIDITY bloqueada para prevenir drenaje total
-- **Librerías Auditadas**: Uso de OpenZeppelin para funcionalidad ERC20
+- **Validations**: Comprehensive input parameter checks
+- **Minimum Liquidity**: MINIMUM_LIQUIDITY locked to prevent total drainage
+- **Audited Libraries**: Use of OpenZeppelin for ERC20 functionality
+- **Overflow Protection**: Automatic overflow protection in Solidity ^0.8.0
 
-## 📊 Eventos
+## 📊 Events
 
-- `LiquidityAdded`: Emitido al agregar liquidez
-- `LiquidityRemoved`: Emitido al remover liquidez  
-- `TokensSwapped`: Emitido al realizar intercambios
-- `Transfer`: Eventos estándar ERC20 para tokens LP
-- `Approval`: Eventos estándar ERC20 para tokens LP
+- `LiquidityAdded`: Emitted when adding liquidity
+- `LiquidityRemoved`: Emitted when removing liquidity
+- `TokensSwapped`: Emitted when executing swaps
+- `Transfer`: Standard ERC20 events for LP tokens
+- `Approval`: Standard ERC20 events for LP tokens
 
-## ⚠️ Consideraciones
+## ⚠️ Considerations
 
-- **Sin Fees**: El contrato no cobra comisiones por intercambios
-- **Par Fijo**: Solo soporta intercambios entre los dos tokens especificados en el constructor
-- **Producto Constante**: Utiliza la fórmula x * y = k para determinar precios
-- **Slippage**: Los usuarios deben especificar cantidades mínimas para protegerse contra slippage excesivo
+- **No Fees**: The contract does not charge fees for swaps
+- **Fixed Pair**: Only supports swaps between the two tokens specified in constructor
+- **Constant Product**: Uses the x * y = k formula to determine prices
+- **Slippage**: Users must specify minimum amounts to protect against excessive slippage
+- **Optimization**: Code optimized for efficient compilation and lower gas usage
+- **Error Messages**: Error strings limited to 31 characters for efficiency
 
-## 📄 Licencia
+## 📄 License
 
 MIT License

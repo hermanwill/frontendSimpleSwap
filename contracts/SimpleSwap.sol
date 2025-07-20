@@ -6,32 +6,32 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title SimpleSwap
- * @dev Contrato de intercambio descentralizado (DEX) para un par de tokens
- * @notice Permite agregar/remover liquidez e intercambiar tokens usando fórmula de producto constante
+ * @dev Decentralized exchange (DEX) contract for a token pair
+ * @notice Allows adding/removing liquidity and swapping tokens using constant product formula
  */
 contract SimpleSwap is ERC20 {
     
-    /// @dev Dirección del primer token del par
+    /// @dev Address of the first token in the pair
     address public immutable tokenA;
     
-    /// @dev Dirección del segundo token del par
+    /// @dev Address of the second token in the pair
     address public immutable tokenB;
 
-    /// @dev Reserva actual del tokenA en el contrato
+    /// @dev Current reserve of tokenA in the contract
     uint256 public reserveA;
     
-    /// @dev Reserva actual del tokenB en el contrato
+    /// @dev Current reserve of tokenB in the contract
     uint256 public reserveB;
 
-    /// @dev Cantidad mínima de liquidez que permanece bloqueada para prevenir ataques
+    /// @dev Minimum amount of liquidity that remains locked to prevent attacks
     uint256 private constant MINIMUM_LIQUIDITY = 1000;
 
     /**
-     * @dev Emitido cuando se agrega liquidez al pool
-     * @param provider Dirección del proveedor de liquidez
-     * @param amountA Cantidad de tokenA agregada
-     * @param amountB Cantidad de tokenB agregada
-     * @param liquidity Cantidad de tokens LP minteados
+     * @dev Emitted when liquidity is added to the pool
+     * @param provider Address of the liquidity provider
+     * @param amountA Amount of tokenA added
+     * @param amountB Amount of tokenB added
+     * @param liquidity Amount of LP tokens minted
      */
     event LiquidityAdded(
         address indexed provider, 
@@ -41,11 +41,11 @@ contract SimpleSwap is ERC20 {
     );
 
     /**
-     * @dev Emitido cuando se remueve liquidez del pool
-     * @param provider Dirección del proveedor de liquidez
-     * @param amountA Cantidad de tokenA retirada
-     * @param amountB Cantidad de tokenB retirada
-     * @param liquidity Cantidad de tokens LP quemados
+     * @dev Emitted when liquidity is removed from the pool
+     * @param provider Address of the liquidity provider
+     * @param amountA Amount of tokenA withdrawn
+     * @param amountB Amount of tokenB withdrawn
+     * @param liquidity Amount of LP tokens burned
      */
     event LiquidityRemoved(
         address indexed provider, 
@@ -55,12 +55,12 @@ contract SimpleSwap is ERC20 {
     );
 
     /**
-     * @dev Emitido cuando se realiza un intercambio de tokens
-     * @param user Dirección del usuario que realiza el swap
-     * @param tokenIn Dirección del token de entrada
-     * @param tokenOut Dirección del token de salida
-     * @param amountIn Cantidad de tokens de entrada
-     * @param amountOut Cantidad de tokens de salida
+     * @dev Emitted when a token swap is performed
+     * @param user Address of the user performing the swap
+     * @param tokenIn Address of the input token
+     * @param tokenOut Address of the output token
+     * @param amountIn Amount of input tokens
+     * @param amountOut Amount of output tokens
      */
     event TokensSwapped(
         address indexed user, 
@@ -71,9 +71,9 @@ contract SimpleSwap is ERC20 {
     );
 
     /**
-     * @dev Constructor del contrato
-     * @param _tokenA Dirección del primer token del par
-     * @param _tokenB Dirección del segundo token del par
+     * @dev Contract constructor
+     * @param _tokenA Address of the first token in the pair
+     * @param _tokenB Address of the second token in the pair
      */
     constructor(address _tokenA, address _tokenB) 
         ERC20("SimpleSwap Liquidity Token", "SSLT") 
@@ -84,13 +84,13 @@ contract SimpleSwap is ERC20 {
         tokenA = _tokenA;
         tokenB = _tokenB;
         
-        // Mintear liquidez mínima para prevenir drenaje total
+        // Mint minimum liquidity to prevent total drain
         _mint(address(this), MINIMUM_LIQUIDITY);
     }
 
     /**
-     * @dev Modificador para verificar que la transacción no haya expirado
-     * @param deadline Timestamp límite para ejecutar la transacción
+     * @dev Modifier to verify that the transaction has not expired
+     * @param deadline Timestamp limit to execute the transaction
      */
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "Expired");
@@ -98,18 +98,18 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Agrega liquidez al pool de intercambio
-     * @param _tokenA Dirección del primer token (debe coincidir con tokenA del contrato)
-     * @param _tokenB Dirección del segundo token (debe coincidir con tokenB del contrato)
-     * @param amountADesired Cantidad deseada de tokenA a agregar
-     * @param amountBDesired Cantidad deseada de tokenB a agregar
-     * @param amountAMin Cantidad mínima aceptable de tokenA
-     * @param amountBMin Cantidad mínima aceptable de tokenB
-     * @param to Dirección que recibirá los tokens LP
-     * @param deadline Timestamp límite para la transacción
-     * @return amountA Cantidad real de tokenA agregada
-     * @return amountB Cantidad real de tokenB agregada
-     * @return liquidity Cantidad de tokens LP minteados
+     * @dev Adds liquidity to the swap pool
+     * @param _tokenA Address of the first token (must match contract's tokenA)
+     * @param _tokenB Address of the second token (must match contract's tokenB)
+     * @param amountADesired Desired amount of tokenA to add
+     * @param amountBDesired Desired amount of tokenB to add
+     * @param amountAMin Minimum acceptable amount of tokenA
+     * @param amountBMin Minimum acceptable amount of tokenB
+     * @param to Address that will receive the LP tokens
+     * @param deadline Timestamp limit for the transaction
+     * @return amountA Actual amount of tokenA added
+     * @return amountB Actual amount of tokenB added
+     * @return liquidity Amount of LP tokens minted
      */
     function addLiquidity(
         address _tokenA,
@@ -124,7 +124,7 @@ contract SimpleSwap is ERC20 {
         require(_isValidTokenPair(_tokenA, _tokenB), "Invalid pair");
         require(to != address(0), "Invalid recipient");
 
-        // Calcular cantidades óptimas
+        // Calculate optimal amounts
         {
             uint256 _reserveA = reserveA;
             uint256 _reserveB = reserveB;
@@ -147,11 +147,11 @@ contract SimpleSwap is ERC20 {
             }
         }
 
-        // Transferir tokens
+        // Transfer tokens
         require(IERC20(_tokenA).transferFrom(msg.sender, address(this), amountA), "Transfer A fail");
         require(IERC20(_tokenB).transferFrom(msg.sender, address(this), amountB), "Transfer B fail");
 
-        // Calcular y mintear liquidez
+        // Calculate and mint liquidity
         {
             uint256 _totalSupply = totalSupply();
             if (_totalSupply == MINIMUM_LIQUIDITY) {
@@ -165,7 +165,7 @@ contract SimpleSwap is ERC20 {
             _mint(to, liquidity);
         }
 
-        // Actualizar reservas
+        // Update reserves
         reserveA += amountA;
         reserveB += amountB;
 
@@ -173,16 +173,16 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Remueve liquidez del pool de intercambio
-     * @param _tokenA Dirección del primer token (debe coincidir con tokenA del contrato)
-     * @param _tokenB Dirección del segundo token (debe coincidir con tokenB del contrato)
-     * @param liquidity Cantidad de tokens LP a quemar
-     * @param amountAMin Cantidad mínima aceptable de tokenA a recibir
-     * @param amountBMin Cantidad mínima aceptable de tokenB a recibir
-     * @param to Dirección que recibirá los tokens
-     * @param deadline Timestamp límite para la transacción
-     * @return amountA Cantidad de tokenA retirada
-     * @return amountB Cantidad de tokenB retirada
+     * @dev Removes liquidity from the swap pool
+     * @param _tokenA Address of the first token (must match contract's tokenA)
+     * @param _tokenB Address of the second token (must match contract's tokenB)
+     * @param liquidity Amount of LP tokens to burn
+     * @param amountAMin Minimum acceptable amount of tokenA to receive
+     * @param amountBMin Minimum acceptable amount of tokenB to receive
+     * @param to Address that will receive the tokens
+     * @param deadline Timestamp limit for the transaction
+     * @return amountA Amount of tokenA withdrawn
+     * @return amountB Amount of tokenB withdrawn
      */
     function removeLiquidity(
         address _tokenA,
@@ -198,7 +198,7 @@ contract SimpleSwap is ERC20 {
         require(liquidity > 0, "Zero liquidity");
         require(balanceOf(msg.sender) >= liquidity, "Insufficient balance");
 
-        // Calcular cantidades de retiro
+        // Calculate withdrawal amounts
         {
             uint256 _reserveA = reserveA;
             uint256 _reserveB = reserveB;
@@ -210,15 +210,15 @@ contract SimpleSwap is ERC20 {
             require(amountA >= amountAMin, "Insufficient A");
             require(amountB >= amountBMin, "Insufficient B");
 
-            // Actualizar reservas
+            // Update reserves
             reserveA = _reserveA - amountA;
             reserveB = _reserveB - amountB;
         }
 
-        // Quemar tokens LP
+        // Burn LP tokens
         _burn(msg.sender, liquidity);
 
-        // Transferir tokens
+        // Transfer tokens
         require(IERC20(_tokenA).transfer(to, amountA), "Transfer A fail");
         require(IERC20(_tokenB).transfer(to, amountB), "Transfer B fail");
 
@@ -226,12 +226,12 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Intercambia una cantidad exacta de tokens de entrada por tokens de salida
-     * @param amountIn Cantidad exacta de tokens de entrada
-     * @param amountOutMin Cantidad mínima aceptable de tokens de salida
-     * @param path Array con las direcciones de los tokens [tokenIn, tokenOut]
-     * @param to Dirección que recibirá los tokens de salida
-     * @param deadline Timestamp límite para la transacción
+     * @dev Swaps an exact amount of input tokens for output tokens
+     * @param amountIn Exact amount of input tokens
+     * @param amountOutMin Minimum acceptable amount of output tokens
+     * @param path Array with token addresses [tokenIn, tokenOut]
+     * @param to Address that will receive the output tokens
+     * @param deadline Timestamp limit for the transaction
      */
     function swapExactTokensForTokens(
         uint256 amountIn,
@@ -244,10 +244,10 @@ contract SimpleSwap is ERC20 {
         require(to != address(0), "Invalid recipient");
         require(_isValidTokenPair(path[0], path[1]), "Invalid pair");
 
-        // Determinar reservas y calcular output
+        // Determine reserves and calculate output
         uint256 amountOut;
         {
-            // Usar variables locales para evitar múltiples accesos a storage
+            // Use local variables to avoid multiple storage accesses
             uint256 _reserveA = reserveA;
             uint256 _reserveB = reserveB;
             
@@ -258,11 +258,11 @@ contract SimpleSwap is ERC20 {
             require(amountOut >= amountOutMin, "Insufficient output");
         }
 
-        // Ejecutar transferencias
+        // Execute transfers
         require(IERC20(path[0]).transferFrom(msg.sender, address(this), amountIn), "Input transfer fail");
         require(IERC20(path[1]).transfer(to, amountOut), "Output transfer fail");
 
-        // Actualizar reservas
+        // Update reserves
         if (path[0] == tokenA) {
             reserveA += amountIn;
             reserveB -= amountOut;
@@ -275,10 +275,10 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Obtiene el precio de un token en términos del otro
-     * @param _tokenA Dirección del token base
-     * @param _tokenB Dirección del token cotizado
-     * @return price Precio escalado por 1e18
+     * @dev Gets the price of one token in terms of the other
+     * @param _tokenA Address of the base token
+     * @param _tokenB Address of the quote token
+     * @return price Price scaled by 1e18
      */
     function getPrice(address _tokenA, address _tokenB) external view returns (uint256 price) {
         require(_isValidTokenPair(_tokenA, _tokenB), "Invalid pair");
@@ -295,35 +295,35 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Calcula la cantidad de tokens de salida para una cantidad de entrada dada
-     * @param amountIn Cantidad de tokens de entrada
-     * @param reserveIn Reserva del token de entrada
-     * @param reserveOut Reserva del token de salida
-     * @return amountOut Cantidad de tokens de salida
+     * @dev Calculates the amount of output tokens for a given input amount
+     * @param amountIn Amount of input tokens
+     * @param reserveIn Reserve of the input token
+     * @param reserveOut Reserve of the output token
+     * @return amountOut Amount of output tokens
      */
     function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut) 
         public pure returns (uint256 amountOut) {
         require(amountIn > 0, "Insufficient input");
         require(reserveIn > 0 && reserveOut > 0, "Insufficient reserves");
         
-        // Fórmula de producto constante sin fees
+        // Constant product formula without fees
         return (amountIn * reserveOut) / (reserveIn + amountIn);
     }
 
     /**
-     * @dev Verifica si el par de tokens es válido para este contrato
-     * @param _tokenA Primera dirección de token
-     * @param _tokenB Segunda dirección de token
-     * @return true si el par es válido
+     * @dev Verifies if the token pair is valid for this contract
+     * @param _tokenA First token address
+     * @param _tokenB Second token address
+     * @return true if the pair is valid
      */
     function _isValidTokenPair(address _tokenA, address _tokenB) internal view returns (bool) {
         return (_tokenA == tokenA && _tokenB == tokenB) || (_tokenA == tokenB && _tokenB == tokenA);
     }
 
     /**
-     * @dev Calcula la raíz cuadrada de un número usando el método babilónico
-     * @param y Número del cual calcular la raíz cuadrada
-     * @return z Raíz cuadrada de y
+     * @dev Calculates the square root of a number using the Babylonian method
+     * @param y Number to calculate square root of
+     * @return z Square root of y
      */
     function _sqrt(uint256 y) internal pure returns (uint256 z) {
         if (y > 3) {
@@ -339,9 +339,9 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Retorna las reservas actuales del pool
-     * @return _reserveA Reserva actual del tokenA
-     * @return _reserveB Reserva actual del tokenB
+     * @dev Returns the current pool reserves
+     * @return _reserveA Current reserve of tokenA
+     * @return _reserveB Current reserve of tokenB
      */
     function getReserves() external view returns (uint256 _reserveA, uint256 _reserveB) {
         _reserveA = reserveA;
@@ -349,9 +349,9 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Retorna las direcciones de los tokens soportados
-     * @return _tokenA Dirección del primer token
-     * @return _tokenB Dirección del segundo token
+     * @dev Returns the addresses of the supported tokens
+     * @return _tokenA Address of the first token
+     * @return _tokenB Address of the second token
      */
     function getSupportedTokens() external view returns (address _tokenA, address _tokenB) {
         _tokenA = tokenA;
@@ -359,17 +359,17 @@ contract SimpleSwap is ERC20 {
     }
 
     /**
-     * @dev Retorna la cantidad de tokens LP que posee un usuario
-     * @param user Dirección del usuario
-     * @return shares Cantidad de tokens LP
+     * @dev Returns the amount of LP tokens owned by a user
+     * @param user Address of the user
+     * @return shares Amount of LP tokens
      */
     function getLiquidityShares(address user) external view returns (uint256 shares) {
         return balanceOf(user);
     }
 
     /**
-     * @dev Retorna la cantidad total de liquidez en el pool
-     * @return total Cantidad total de tokens LP en circulación
+     * @dev Returns the total amount of liquidity in the pool
+     * @return total Total amount of LP tokens in circulation
      */
     function getTotalLiquidity() external view returns (uint256 total) {
         return totalSupply();

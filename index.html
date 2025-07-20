@@ -8,41 +8,53 @@
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 </head>
 <body>
+    <!-- @dev Wallet connection button -->
     <button onclick="conectar()">Conectar Billetera</button>
+    <!-- @dev Display connected wallet address -->
     <p id="accountAddress"></p>
     
     <main>
-        <!-- Información del Pool -->
+        <!-- @dev Pool information section -->
+        <!-- @notice Displays current pool reserves and token addresses -->
         <div class="container">
             <h1>Información del Pool</h1>
             <button id="poolInfoButton" onclick="obtenerInfoPool()">Actualizar Info</button>
             <div class="info-display">
+                <!-- @dev Token addresses display -->
                 <p id="tokenAAddress">Token A: No conectado</p>
                 <p id="tokenBAddress">Token B: No conectado</p>
+                <!-- @dev Pool reserves display -->
                 <p id="reserveA">Reserva Token A: 0</p>
                 <p id="reserveB">Reserva Token B: 0</p>
+                <!-- @dev Total liquidity display -->
                 <p id="totalLiquidity">Liquidez Total: 0</p>
             </div>
         </div>
 
-        <!-- Obtener Precio -->
+        <!-- @dev Price query section -->
+        <!-- @notice Allows users to check token prices -->
         <div class="container">
             <h1>Consultar Precio</h1>
             <div class="input-group">
+                <!-- @dev Base token selector for price calculation -->
                 <label for="tokenBase">Token Base:</label>
                 <select id="tokenBase">
                     <option value="A">Token A</option>
                     <option value="B">Token B</option>
                 </select>
             </div>
+            <!-- @dev Button to fetch current price -->
             <button id="priceButton" onclick="obtenerPrecio()">Obtener Precio</button>
+            <!-- @dev Price result display -->
             <p id="priceResult"></p>
         </div>
 
-        <!-- Intercambio de Tokens -->
+        <!-- @dev Token swap section -->
+        <!-- @notice Main interface for token swapping functionality -->
         <div class="container">
             <h1>Intercambio de Tokens</h1>
             <div class="swap-container">
+                <!-- @dev Input token selection -->
                 <div class="input-group">
                     <label for="tokenFrom">Desde:</label>
                     <select id="tokenFrom">
@@ -51,13 +63,16 @@
                     </select>
                 </div>
                 
+                <!-- @dev Amount to send input -->
                 <div class="input-group">
                     <label for="amountIn">Cantidad a enviar:</label>
                     <input type="text" id="amountIn" placeholder="0.0" />
                 </div>
                 
+                <!-- @dev Swap direction toggle button -->
                 <button class="swap-button" onclick="cambiarDireccion()">⇅ Cambiar</button>
                 
+                <!-- @dev Output token selection -->
                 <div class="input-group">
                     <label for="tokenTo">Hacia:</label>
                     <select id="tokenTo">
@@ -66,43 +81,56 @@
                     </select>
                 </div>
                 
+                <!-- @dev Estimated amount to receive (read-only) -->
                 <div class="input-group">
                     <label for="amountOut">Cantidad a recibir (estimada):</label>
                     <input type="text" id="amountOut" placeholder="0.0" readonly />
                 </div>
                 
+                <!-- @dev Maximum slippage tolerance input -->
                 <div class="input-group">
                     <label for="slippage">Slippage máximo (%):</label>
                     <input type="text" id="slippage" value="0.5" placeholder="0.5" />
                 </div>
                 
+                <!-- @dev Transaction deadline input -->
                 <div class="input-group">
                     <label for="deadline">Deadline (minutos):</label>
                     <input type="text" id="deadline" value="20" placeholder="20" />
                 </div>
             </div>
             
+            <!-- @dev Action buttons for swap process -->
             <div class="button-group">
+                <!-- @dev Estimate swap output button -->
                 <button id="estimateButton" onclick="estimarIntercambio()">Estimar</button>
+                <!-- @dev Token approval button (initially disabled) -->
                 <button id="approveButton" onclick="aprobarToken()" disabled>Aprobar Token</button>
+                <!-- @dev Execute swap button (initially disabled) -->
                 <button id="swapButton" onclick="ejecutarIntercambio()" disabled>Intercambiar</button>
             </div>
             
+            <!-- @dev Swap result/status display -->
             <p id="swapResult"></p>
         </div>
 
-        <!-- Balance de Tokens -->
+        <!-- @dev User balance section -->
+        <!-- @notice Displays user's token balances -->
         <div class="container">
             <h1>Mis Balances</h1>
+            <!-- @dev Button to refresh balance information -->
             <button id="balanceButton" onclick="obtenerBalances()">Actualizar Balances</button>
             <div class="info-display">
+                <!-- @dev Individual token balance displays -->
                 <p id="balanceA">Token A: 0</p>
                 <p id="balanceB">Token B: 0</p>
+                <!-- @dev LP token balance display -->
                 <p id="balanceLP">Tokens LP: 0</p>
             </div>
         </div>
     </main>
     
+    <!-- @dev Main JavaScript functionality -->
     <script src="script.js"></script>
 </body>
 </html>

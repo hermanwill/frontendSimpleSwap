@@ -1,11 +1,11 @@
-// Configuración del contrato
+// @dev Contract configuration
 const addressContract = "0xC52f33Cc4d48F3C72144C2b0E82C25B401bEF1f5"; // Reemplazar con la dirección real
 const tokenAAddress = "0xB9D62F684D533D89ed7a59f0b97aa6847Ea7b935"; // Reemplazar con la dirección real del Token A
 const tokenBAddress = "0x15d00E0E845d981f03010Aa69f6045EB305f30b6"; // Reemplazar con la dirección real del Token B
 
-// ABI del contrato SimpleSwap (versión simplificada con las funciones principales)
+// @dev SimpleSwap contract ABI (simplified version with main functions)
 const simpleSwapABI = [
-    // Funciones de lectura
+    // @dev Read functions
     "function getReserves() view returns (uint256 _reserveA, uint256 _reserveB)",
     "function getSupportedTokens() view returns (address _tokenA, address _tokenB)",
     "function getTotalLiquidity() view returns (uint256 total)",
@@ -13,18 +13,18 @@ const simpleSwapABI = [
     "function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut) pure returns (uint256 amountOut)",
     "function getLiquidityShares(address user) view returns (uint256 shares)",
     
-    // Funciones de escritura
+    // @dev Write functions
     "function swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)"
 ];
 
-// ABI básico para tokens ERC20
+// @dev Basic ABI for ERC20 tokens
 const erc20ABI = [
     "function balanceOf(address owner) view returns (uint256)",
     "function approve(address spender, uint256 amount) returns (bool)",
     "function allowance(address owner, address spender) view returns (uint256)"
 ];
 
-// Variables globales
+// @dev Global variables
 let signer;
 let simpleSwapContract;
 let tokenAContract;
@@ -32,30 +32,31 @@ let tokenBContract;
 let userAddress;
 
 /**
- * Conecta la billetera MetaMask
+ * @dev Connects MetaMask wallet
+ * @notice Requests access to user accounts and initializes contracts
  */
 async function conectar() {
     try {
         if (typeof window.ethereum !== "undefined") {
             console.log("MetaMask detectado");
             
-            // Solicitar acceso a las cuentas
+            // @dev Request access to accounts
             await window.ethereum.request({ method: "eth_requestAccounts" });
             
-            // Crear provider y signer
+            // @dev Create provider and signer
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             signer = provider.getSigner();
             userAddress = await signer.getAddress();
             
-            // Mostrar dirección del usuario
+            // @dev Display user address
             document.getElementById("accountAddress").innerText = `Conectado: ${userAddress}`;
             
-            // Inicializar contratos
+            // @dev Initialize contracts
             simpleSwapContract = new ethers.Contract(addressContract, simpleSwapABI, signer);
             tokenAContract = new ethers.Contract(tokenAAddress, erc20ABI, signer);
             tokenBContract = new ethers.Contract(tokenBAddress, erc20ABI, signer);
             
-            // Cargar información inicial
+            // @dev Load initial information
             await obtenerInfoPool();
             await obtenerBalances();
             
@@ -70,7 +71,8 @@ async function conectar() {
 }
 
 /**
- * Obtiene la información del pool
+ * @dev Gets pool information
+ * @notice Retrieves supported tokens, reserves, and total liquidity
  */
 async function obtenerInfoPool() {
     try {
@@ -79,17 +81,17 @@ async function obtenerInfoPool() {
             return;
         }
         
-        // Obtener tokens soportados
+        // @dev Get supported tokens
         const [tokenA, tokenB] = await simpleSwapContract.getSupportedTokens();
         document.getElementById("tokenAAddress").innerText = `Token A: ${tokenA}`;
         document.getElementById("tokenBAddress").innerText = `Token B: ${tokenB}`;
         
-        // Obtener reservas
+        // @dev Get reserves
         const [reserveA, reserveB] = await simpleSwapContract.getReserves();
         document.getElementById("reserveA").innerText = `Reserva Token A: ${ethers.utils.formatEther(reserveA)}`;
         document.getElementById("reserveB").innerText = `Reserva Token B: ${ethers.utils.formatEther(reserveB)}`;
         
-        // Obtener liquidez total
+        // @dev Get total liquidity
         const totalLiquidity = await simpleSwapContract.getTotalLiquidity();
         document.getElementById("totalLiquidity").innerText = `Liquidez Total: ${ethers.utils.formatEther(totalLiquidity)}`;
         
@@ -100,7 +102,8 @@ async function obtenerInfoPool() {
 }
 
 /**
- * Obtiene el precio de un token en función del otro
+ * @dev Gets the price of one token in terms of the other
+ * @notice Calculates and displays token price based on current reserves
  */
 async function obtenerPrecio() {
     try {
@@ -113,12 +116,12 @@ async function obtenerPrecio() {
         let precio;
         
         if (tokenBase === "A") {
-            // Precio de Token A en términos de Token B
+            // @dev Price of Token A in terms of Token B
             precio = await simpleSwapContract.getPrice(tokenAAddress, tokenBAddress);
             document.getElementById("priceResult").innerText = 
                 `1 Token A = ${ethers.utils.formatEther(precio)} Token B`;
         } else {
-            // Precio de Token B en términos de Token A
+            // @dev Price of Token B in terms of Token A
             precio = await simpleSwapContract.getPrice(tokenBAddress, tokenAAddress);
             document.getElementById("priceResult").innerText = 
                 `1 Token B = ${ethers.utils.formatEther(precio)} Token A`;
@@ -134,7 +137,8 @@ async function obtenerPrecio() {
 }
 
 /**
- * Obtiene los balances del usuario
+ * @dev Gets user's token balances
+ * @notice Retrieves and displays balances for TokenA, TokenB, and LP tokens
  */
 async function obtenerBalances() {
     try {
@@ -142,15 +146,15 @@ async function obtenerBalances() {
             return;
         }
         
-        // Balance Token A
+        // @dev Token A balance
         const balanceA = await tokenAContract.balanceOf(userAddress);
         document.getElementById("balanceA").innerText = `Token A: ${ethers.utils.formatEther(balanceA)}`;
         
-        // Balance Token B
+        // @dev Token B balance
         const balanceB = await tokenBContract.balanceOf(userAddress);
         document.getElementById("balanceB").innerText = `Token B: ${ethers.utils.formatEther(balanceB)}`;
         
-        // Balance LP Tokens
+        // @dev LP Tokens balance
         const balanceLP = await simpleSwapContract.getLiquidityShares(userAddress);
         document.getElementById("balanceLP").innerText = `Tokens LP: ${ethers.utils.formatEther(balanceLP)}`;
         
@@ -160,7 +164,8 @@ async function obtenerBalances() {
 }
 
 /**
- * Cambia la dirección del intercambio (From <-> To)
+ * @dev Changes swap direction (From <-> To)
+ * @notice Swaps the selected tokens and clears input fields
  */
 function cambiarDireccion() {
     const tokenFrom = document.getElementById("tokenFrom");
@@ -170,14 +175,15 @@ function cambiarDireccion() {
     tokenFrom.value = tokenTo.value;
     tokenTo.value = tempValue;
     
-    // Limpiar campos
+    // @dev Clear input fields
     document.getElementById("amountIn").value = "";
     document.getElementById("amountOut").value = "";
     document.getElementById("swapResult").innerText = "";
 }
 
 /**
- * Estima la cantidad que se recibirá en el intercambio
+ * @dev Estimates the amount to be received in the swap
+ * @notice Calculates output amount based on current reserves and input amount
  */
 async function estimarIntercambio() {
     try {
@@ -195,7 +201,7 @@ async function estimarIntercambio() {
         const tokenFrom = document.getElementById("tokenFrom").value;
         const amountInWei = ethers.utils.parseEther(amountIn);
         
-        // Obtener reservas actuales
+        // @dev Get current reserves
         const [reserveA, reserveB] = await simpleSwapContract.getReserves();
         
         let reserveIn, reserveOut;
@@ -207,11 +213,11 @@ async function estimarIntercambio() {
             reserveOut = reserveA;
         }
         
-        // Calcular cantidad de salida
+        // @dev Calculate output amount
         const amountOut = await simpleSwapContract.getAmountOut(amountInWei, reserveIn, reserveOut);
         document.getElementById("amountOut").value = ethers.utils.formatEther(amountOut);
         
-        // Habilitar botón de aprobación
+        // @dev Enable approval button
         document.getElementById("approveButton").disabled = false;
         
         document.getElementById("swapResult").innerText = "Estimación actualizada";
@@ -225,7 +231,8 @@ async function estimarIntercambio() {
 }
 
 /**
- * Aprueba el token para el intercambio
+ * @dev Approves token for swap
+ * @notice Grants allowance to the contract to spend user's tokens
  */
 async function aprobarToken() {
     try {
@@ -246,7 +253,7 @@ async function aprobarToken() {
         const tx = await tokenContract.approve(addressContract, amountInWei);
         await tx.wait();
         
-        // Habilitar botón de intercambio
+        // @dev Enable swap button
         document.getElementById("swapButton").disabled = false;
         
         document.getElementById("swapResult").innerText = "Token aprobado exitosamente";
@@ -260,7 +267,8 @@ async function aprobarToken() {
 }
 
 /**
- * Ejecuta el intercambio de tokens
+ * @dev Executes the token swap
+ * @notice Performs the actual token exchange with slippage protection
  */
 async function ejecutarIntercambio() {
     try {
@@ -279,20 +287,20 @@ async function ejecutarIntercambio() {
         const amountInWei = ethers.utils.parseEther(amountIn);
         const amountOutWei = ethers.utils.parseEther(amountOut);
         
-        // Calcular cantidad mínima con slippage
+        // @dev Calculate minimum amount with slippage
         const slippageMultiplier = (100 - slippage) / 100;
         const amountOutMin = amountOutWei.mul(Math.floor(slippageMultiplier * 10000)).div(10000);
         
-        // Crear path
+        // @dev Create swap path
         const path = tokenFrom === "A" ? [tokenAAddress, tokenBAddress] : [tokenBAddress, tokenAAddress];
         
-        // Calcular deadline
+        // @dev Calculate deadline
         const deadline = Math.floor(Date.now() / 1000) + (deadlineMinutes * 60);
         
         document.getElementById("swapResult").innerText = "Ejecutando intercambio...";
         document.getElementById("swapResult").className = "";
         
-        // Ejecutar swap
+        // @dev Execute swap
         const tx = await simpleSwapContract.swapExactTokensForTokens(
             amountInWei,
             amountOutMin,
@@ -303,11 +311,11 @@ async function ejecutarIntercambio() {
         
         await tx.wait();
         
-        // Actualizar información
+        // @dev Update information
         await obtenerInfoPool();
         await obtenerBalances();
         
-        // Limpiar formulario
+        // @dev Clear form
         document.getElementById("amountIn").value = "";
         document.getElementById("amountOut").value = "";
         document.getElementById("approveButton").disabled = true;
