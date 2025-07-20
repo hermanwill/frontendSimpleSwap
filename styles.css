@@ -1,0 +1,220 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f4f7fa;
+    color: #1a1a1a;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Botones */
+button {
+    background-color: #0057b8;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #00429e;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    background-color: #cccccc;
+}
+
+/* Contenedor principal */
+.container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Título */
+h1 {
+    font-size: 24px;
+    color: #0057b8;
+    margin-bottom: 20px;
+}
+
+/* Grupos de input */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Campos de entrada */
+input[type="text"] {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #0057b8;
+    box-shadow: 0 0 5px rgba(0, 87, 184, 0.3);
+}
+
+input[readonly] {
+    background-color: #f9f9f9;
+    color: #666;
+}
+
+/* Select */
+select {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: white;
+}
+
+select:focus {
+    outline: none;
+    border-color: #0057b8;
+    box-shadow: 0 0 5px rgba(0, 87, 184, 0.3);
+}
+
+/* Contenedor de intercambio */
+.swap-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Botón de intercambio */
+.swap-button {
+    background-color: #28a745;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 20px;
+    margin: 10px auto;
+    display: block;
+}
+
+.swap-button:hover {
+    background-color: #218838;
+}
+
+/* Grupo de botones */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    margin: 0;
+}
+
+/* Display de información */
+.info-display {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.info-display p {
+    margin: 8px 0;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* Texto dinámico */
+#accountAddress {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #333;
+    word-break: break-all;
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+#priceResult,
+#swapResult {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+#priceResult {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+#swapResult {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Estados de error */
+.error {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+.success {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+    }
+    
+    .container {
+        padding: 20px;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+    
+    button {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

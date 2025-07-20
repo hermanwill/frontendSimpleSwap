@@ -1,79 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Token Swap App</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3@4.11.1/dist/web3.min.js"></script>
-    <script src="./contracts.js"></script>
-    <script src="./script.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SimpleSwap DEX</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 </head>
 <body>
-    <button id="conect" onclick="connect()">
-        <label id="account" style="cursor: pointer;">Conectar</label>
-    </button>
-    <br>
+    <button onclick="conectar()">Conectar Billetera</button>
+    <p id="accountAddress"></p>
     
-    <div id='swap-box'>
-        <div id="swap-menu">
-            <label class="token">USDT</label> to <label class="token">Aleph</label>
+    <main>
+        <!-- Información del Pool -->
+        <div class="container">
+            <h1>Información del Pool</h1>
+            <button id="poolInfoButton" onclick="obtenerInfoPool()">Actualizar Info</button>
+            <div class="info-display">
+                <p id="tokenAAddress">Token A: No conectado</p>
+                <p id="tokenBAddress">Token B: No conectado</p>
+                <p id="reserveA">Reserva Token A: 0</p>
+                <p id="reserveB">Reserva Token B: 0</p>
+                <p id="totalLiquidity">Liquidez Total: 0</p>
+            </div>
         </div>
-        
-        <div id="swap-title-box">
-            <p id="swap-title">Swap</p>
-            <p id="swap-subtitle">Trade tokens in an instant</p>
+
+        <!-- Obtener Precio -->
+        <div class="container">
+            <h1>Consultar Precio</h1>
+            <div class="input-group">
+                <label for="tokenBase">Token Base:</label>
+                <select id="tokenBase">
+                    <option value="A">Token A</option>
+                    <option value="B">Token B</option>
+                </select>
+            </div>
+            <button id="priceButton" onclick="obtenerPrecio()">Obtener Precio</button>
+            <p id="priceResult"></p>
         </div>
-        
-        <div id="swap-form-box">
-            <form id='form' onsubmit='handleSubmit(); return false;'>
+
+        <!-- Intercambio de Tokens -->
+        <div class="container">
+            <h1>Intercambio de Tokens</h1>
+            <div class="swap-container">
                 <div class="input-group">
-                    <label>
-                        <img id="alephLogo" src='./Aleph.png' class="logo" alt="Aleph Logo" /> 
-                        <span class="token">Aleph</span>
-                        <div class="swap-balance pick-balance">
-                            Balance: <span class="balance" id="balanceAleph">0</span>
-                        </div>
-                    </label>
-                    <input onchange='setValueTokenToSpend()' type="text" class="IHAVE" placeholder="0.0">
+                    <label for="tokenFrom">Desde:</label>
+                    <select id="tokenFrom">
+                        <option value="A">Token A</option>
+                        <option value="B">Token B</option>
+                    </select>
                 </div>
-                
-                <br>
                 
                 <div class="input-group">
-                    <label>
-                        <img id="usdtLogo" src='./USDT.png' class="logo" alt="USDT Logo"/>
-                        <span class="token">USDT</span>
-                        <div class="swap-balance">
-                            Balance: <span class="balance" id="balanceUSDT">0</span>
-                        </div>
-                    </label>
-                    <input type="text" class="IWANT" placeholder="0.0">
+                    <label for="amountIn">Cantidad a enviar:</label>
+                    <input type="text" id="amountIn" placeholder="0.0" />
                 </div>
                 
-                <div class="separador-vertical"></div>
+                <button class="swap-button" onclick="cambiarDireccion()">⇅ Cambiar</button>
                 
-                <div id="swap-price-word">
-                    Price 
-                    <div id="swap-price">
-                        TOKEN_PRICE <span class="precio">0</span> USDT
-                    </div>
+                <div class="input-group">
+                    <label for="tokenTo">Hacia:</label>
+                    <select id="tokenTo">
+                        <option value="B">Token B</option>
+                        <option value="A">Token A</option>
+                    </select>
                 </div>
                 
-                <button id="swap-submit" type="submit">Swap</button>
-            </form>
+                <div class="input-group">
+                    <label for="amountOut">Cantidad a recibir (estimada):</label>
+                    <input type="text" id="amountOut" placeholder="0.0" readonly />
+                </div>
+                
+                <div class="input-group">
+                    <label for="slippage">Slippage máximo (%):</label>
+                    <input type="text" id="slippage" value="0.5" placeholder="0.5" />
+                </div>
+                
+                <div class="input-group">
+                    <label for="deadline">Deadline (minutos):</label>
+                    <input type="text" id="deadline" value="20" placeholder="20" />
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="estimateButton" onclick="estimarIntercambio()">Estimar</button>
+                <button id="approveButton" onclick="aprobarToken()" disabled>Aprobar Token</button>
+                <button id="swapButton" onclick="ejecutarIntercambio()" disabled>Intercambiar</button>
+            </div>
+            
+            <p id="swapResult"></p>
         </div>
-    </div>
+
+        <!-- Balance de Tokens -->
+        <div class="container">
+            <h1>Mis Balances</h1>
+            <button id="balanceButton" onclick="obtenerBalances()">Actualizar Balances</button>
+            <div class="info-display">
+                <p id="balanceA">Token A: 0</p>
+                <p id="balanceB">Token B: 0</p>
+                <p id="balanceLP">Tokens LP: 0</p>
+            </div>
+        </div>
+    </main>
     
-    <div id="toast"></div>
-    
-    <div id="spinner" class="spinner-container">
-        <div class="spinner"></div>
-    </div>
+    <script src="script.js"></script>
 </body>
 </html>
-
-Smart, efficient model for everyday use Más información
-Artefactos
-
-Contenido
